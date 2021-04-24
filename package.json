@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7",
+    "socket.io": "^4.0.1"
+  },
+  "name": "y",
+  "description": "Platzi Master project for cohort 7: Gaming Platform",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Santiagonk/gaming_platform.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Santiagonk/gaming_platform/issues"
+  },
+  "homepage": "https://github.com/Santiagonk/gaming_platform#readme"
+}
