@@ -1,0 +1,1 @@
+const { GRID_SIZE} = require('./utils/constans')

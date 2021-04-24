@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "express": "^4.17.1",
-    "nodemon": "^2.0.7"
+    "helmet": "^4.5.0",
+    "nodemon": "^2.0.7",
+    "socket.io": "^4.0.1"
   },
   "name": "gaming_platform",
   "description": "Platzi Master project for cohort 7: Gaming Platform",
