@@ -1,12 +1,19 @@
 const express = require('express');
 const path = require("path");
 const app = express();
-const http = require('http');
-const server = http.createServer(app);
-const { Server } = require("socket.io");
+const httpServer = require('http').createServer(app);
+//const server = http.createServer(app);
+const io = require("socket.io")(httpServer, {
+  cors: {
+    origin: ["http://127.0.0.1:5500", "http://localhost:8000/"],
+    methods: ["GET", "POST"]
+  }
+});
+const { createGameState, gameLoop, getUpdatedVelocity} = require("./games/snake/game");
+const { FRAME_RATE } = require("./games/snake/utils/constanst");
 const helmet = require("helmet");
 var cors = require('cors');
-const io = new Server(server);
+// const io = new Server(server);
 // Middlewares
 // This sets custom options for the `referrerPolicy` middleware.
 app.use(
@@ -14,32 +21,60 @@ app.use(
     contentSecurityPolicy: false,
   })
 );
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({
-  extended: true
-}));
-// static files
-app.use("/",express.static(path.join(__dirname, "/")));
-//
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:8000/socket.io/?EIO=3&transport=polling&t=Na6Arf5"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+   extended: true
+ }));
+//static files
+ app.use("/",express.static(path.join(__dirname, "/")));
 
 //redirect
 app.get('/', function(req, res){
   res.redirect('/');   
 });
 
-io.on('connection', (socket) => {
-  socket.emit('init', { data: 'hello world'});
-});
-// io.on('connection', client => {
-//   client.emit('init', {data: "Hi!!!"});
-// });
+io.on('connection', client => {
+ const state = createGameState();
+ client.on('keydown', handleKeydown);
+ 
+function handleKeydown (keyCode){
+  try {
+    keyCode = parseInt(keyCode);
+  } catch(e) {
+    console.error(e);
+    return;
+  }
 
-server.listen(8000, () => {
+  const vel = getUpdatedVelocity(keyCode);
+
+  if (vel){
+    state.player.vel = vel;
+  }
+
+}
+
+ startGameInterval(client, state); 
+});
+
+function startGameInterval(client, state) {
+  
+  const intervalId = setInterval(()=>{
+    const winner = gameLoop(state);
+    
+    if (!winner) {
+      
+      client.emit( 'gameState', JSON.stringify(state));
+      
+    } else {
+      client.emit('gameOver');
+      clearInterval(intervalId);
+      
+    }
+  }, 1000 / FRAME_RATE);
+}
+
+//io.listen(8000);
+httpServer.listen(8000, () => {
   console.log('listening on *:8000');
 });

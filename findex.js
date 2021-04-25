@@ -6,35 +6,15 @@ const FOOD_COLOUR = "#e66916";
 const socket = io("http://localhost:8000/");
 
 socket.on('init', handleInit);
-socket.on('gamestate', handleGamestate);
+socket.on('gameState', handleGamestate);
+socket.on('gameOver', handleGameOver);
 
 // Set DOM contants
 const gameScreen = document.getElementById( 'gameScreen' );
 
 let canvas, ctx;
 //
-const gameState = {
-    player: {
-        pos: {
-            x: 3,
-            y: 10,
-        },
-        vel: {
-            x: 1,
-            y: 0,
-        },
-        snake: [
-            {x: 1, y:10},
-            {x: 2, y:10},
-            {x: 3, y:10},
-        ],
-    },
-    food: {
-        x: 7,
-        y: 7,
-    },
-    gridsize: 28,    
-};
+
 // Create the canvas
 function init() {
     canvas = document.getElementById( 'canvas' );
@@ -49,10 +29,10 @@ function init() {
 }
 // Take keyboard code
 function keydown(e) {
-    console.log(e.keyCode);
+    socket.emit('keydown',e.keyCode);
 }
 // Initialize the function
-init();
+
 
 function paintGame (state) {
     ctx.fillStyle = BG_COLOUR;
@@ -85,6 +65,13 @@ function handleInit (msg) {
 }
 
 function handleGamestate(gameState) {
+    
     gameState = JSON.parse(gameState);
     requestAnimationFrame(() => paintGame(gameState));
 }
+
+function handleGameOver() {
+    alert("You Lose!!!")
+}
+
+init();
