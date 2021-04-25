@@ -14,7 +14,7 @@ const { FRAME_RATE } = require("./games/snake/utils/constanst");
 const { makeId } = require("./utils/utils")
 const state = {};
 const clientRooms = {};
-var gamers =0;
+
 const helmet = require("helmet");
 var cors = require('cors');
 // const io = new Server(server);
@@ -47,40 +47,33 @@ io.on('connection', client => {
 
 function handleJoinGame (roomName){
   
-  // const room = io.of("/").adapter.on("join-room", (room, id) => {
-  //   console.log(`Player2: socket ${id} has joined room ${room}`);
-  // });
-  // const room = io.of("/").adapter.rooms[roomName];
-  // const room = io.sockets.adapter.rooms[roomName];
-  
-  let allUsers;
-  // if (room) {      
-  //   allUsers = room.sockets;
-  // }
+  const { rooms } = client;
+  let numClients;
+  if (rooms){
+    numClients = rooms.size;
+  }
 
-  // let numClients = 0;
-  // if (allUsers){
-  //   console.log("Create num Clients")
-  //   numClients = Object.keys(allUsers).length;
-  // }
-
-  if (gamers ===0){
-    console.log("We don't have that room")
-    client.emit('unknowGame');
+  if (numClients === 0){
+    console.log("Unknown game")
     return;
-  } else if (gamers > 1){
-    console.log("Too Many players in te room")
-    client.emit('too Many Players');
-    gamers += 1;
+  } else if (numClients > 1) {
+    console.log("Too Many Players")
     return;
   }
 
-  clientRooms[client.id] = roomName;
 
-  client.join(roomName);
-  console.log("Player 2: Join to the play");
+  
+
+  clientRooms[client.id] = roomName;
+ 
+
+  client.join(roomName);  
+  console.log("Player 2: Join to the play"); 
+    
   client.number = 2;
   client.emit('init',2);
+
+  
 
   startGameInterval(roomName);
 }
@@ -143,9 +136,9 @@ function startGameInterval(roomName) {
       //client.emit('gameOver');
       state[roomName] = null;
       clearInterval(intervalId);
-      gamers =0;
+      
     }
-  }, 1000 / FRAME_RATE);
+  }, 2000 / FRAME_RATE);
 }
 
 function emitGameState (roomName, state) {
