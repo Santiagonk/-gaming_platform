@@ -1,3 +1,5 @@
+//const { reset } = require("nodemon");
+
 // Set global constants
 const BG_COLOUR = '#231f20';
 const SNAKE_COLOUR = '#c2c2c2';
@@ -8,24 +10,52 @@ const socket = io("http://localhost:8000/");
 socket.on('init', handleInit);
 socket.on('gameState', handleGamestate);
 socket.on('gameOver', handleGameOver);
+socket.on('gameCode', handleGameCode);
+socket.on('unknownGame', handleUnknownGame);
+socket.on('tooManyPlayers', handleTooManyPlayers);
 
 // Set DOM contants
 const gameScreen = document.getElementById( 'gameScreen' );
+const initialScreen = document.getElementById( 'initialScreen');
+const newGameBtn = document.getElementById( 'newGameButton');
+const joinGameBtn = document.getElementById( 'joinGameButton');
+const gameCodeInput = document.getElementById( 'gameCodeInput' );
+const gameCodeDisplay = document.getElementById( 'gameCodeDisplay' );
+
+newGameBtn.addEventListener('click', newGame);
+joinGameBtn.addEventListener('click', joinGame);
+
+function newGame () {
+    socket.emit('newGame');
+    init();
+}
+
+function joinGame () {
+    const code = gameCodeInput.value;
+    socket.emit('joinGame', code);
+    init();
+}
 
 let canvas, ctx;
+let playerNumber;
+let gameActive = false;
 //
 
 // Create the canvas
 function init() {
+    initialScreen.style.display = 'none';
+    gameScreen.style.display = 'block';
+
     canvas = document.getElementById( 'canvas' );
     ctx = canvas.getContext('2d');
 
-    canvas.width = canvas.height = 600;
+    canvas.width = canvas.height = 450;
 
     ctx.fillStyle = BG_COLOUR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     document.addEventListener( 'keydown', keydown);
+    gameActive = true;
 }
 // Take keyboard code
 function keydown(e) {
@@ -35,6 +65,7 @@ function keydown(e) {
 
 
 function paintGame (state) {
+    
     ctx.fillStyle = BG_COLOUR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -45,7 +76,8 @@ function paintGame (state) {
     ctx.fillStyle = FOOD_COLOUR;
     ctx.fillRect(food.x * size, food.y * size, size, size);
 
-    paintPlayer(state.player, size, SNAKE_COLOUR);
+    paintPlayer(state.players[0], size, SNAKE_COLOUR);
+    paintPlayer(state.players[1], size, 'red');
 }
 
 function paintPlayer (playerState, size, colour) {
@@ -60,18 +92,53 @@ function paintPlayer (playerState, size, colour) {
 }
 
 
-function handleInit (msg) {
-    console.log(msg)
+function handleInit (number) {
+    playerNumber = number;
+    
 }
 
 function handleGamestate(gameState) {
     
-    gameState = JSON.parse(gameState);
+    if (!gameActive) {
+        return;
+    }
+    gameState = JSON.parse(gameState);    
     requestAnimationFrame(() => paintGame(gameState));
 }
 
-function handleGameOver() {
-    alert("You Lose!!!")
+function handleGameOver(data) {
+    if (!gameActive) {
+        return;
+    }
+    
+    data = JSON.parse(data);
+
+    if (data.winner === playerNumber) {
+        alert("You Win!!!");
+    } else {
+        alert("You Lose!!!")
+    }
+    gameActive = false;
 }
 
-init();
+function handleGameCode(gameCode) {
+    gameCodeDisplay.innerText = gameCode;
+}
+
+function reset() {
+    playerNumber = null;
+    gameCodeInput.value = "";
+    initialScreen.style.display = "block";
+    gameScreen.style.display = "none";
+}
+
+function handleUnknownGame() {
+    reset();
+    alert("Unknown game code");
+}
+
+function handleTooManyPlayers() {
+    reset();
+    alert("This game is already in progress");
+}
+
