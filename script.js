@@ -23,9 +23,24 @@ const computerDeckElement = document.querySelector(".computer-deck");
 const playerDeckElement = document.querySelector(".player-deck");
 const poolDeckElement = document.querySelector(".pool-deck");
 const text = document.querySelector(".text");
+const changeCard = document.getElementById("change-card");
 
 
 let gameDeck, playerDeck, computerDeck, poolDeck ,inRound, stop, number_of_deck;
+
+changeCard.addEventListener("click", () => {
+  const playerCard = playerDeck.pop();
+  const poolCard = poolDeck.pop();
+
+  poolDeck.cards.unshift(playerCard);
+  playerDeck.cards.unshift(poolCard);
+
+  console.log("player Card ",playerCard);
+  console.log(poolDeck.cards);
+  console.log("pool Card ",poolCard);
+  console.log(playerDeck.cards);
+
+})
 
 document.addEventListener("click", () => {
   if (stop) {
@@ -46,10 +61,12 @@ function startGame() {
   deck.shuffle();
 
   const deckMidpoint = Math.ceil(deck.numberOfCards / 2);
-  gameDeck = new Deck(deck.cards);
+  
   playerDeck = new Deck(deck.cards.slice(0, 5));
   computerDeck = new Deck(deck.cards.slice(5, 10));
+  gameDeck = new Deck(deck.cards.slice(12,52));
   poolDeck = new Deck(deck.cards.slice(11, 12));
+
   number_of_deck = 12;
   inRound = false;
   stop = false;  
@@ -68,44 +85,47 @@ function cleanBeforeRound() {
 
 function updateDeckCount() {
   computerDeckElement.innerText = computerDeck.numberOfCards;
-  playerDeckElement.innerText = playerDeck.numberOfCards;
-  if(number_of_deck === 12) {
-    poolDeckElement.innerText = poolDeck.numberOfCards;
-  } else {
-    poolDeckElement.innerText = poolDeck.length;
-  }
-  
+  playerDeckElement.innerText = playerDeck.numberOfCards;  
+  poolDeckElement.innerText = poolDeck.numberOfCards; 
+  const poolCard = poolDeck.pop();
+  poolDeck.cards.unshift(poolCard);
+  poolCardSlot.appendChild(poolCard.getHTML()); 
 }
 
 
 function flipCards() {
   inRound = true;
-
+  
   const playerCard = playerDeck.pop();
   const computerCard = computerDeck.pop();
-  const poolCard = poolDeck.pop();
+  const poolCard = gameDeck.pop();
+  
   playerCardSlot.appendChild(playerCard.getHTML())
   computerCardSlot.appendChild(computerCard.getHTML());
   poolCardSlot.appendChild(poolCard.getHTML());
-  poolDeck = gameDeck.cards.slice(number_of_deck, number_of_deck + 1);
+  
+  poolDeck.cards.unshift(poolCard);
+  playerDeck.cards.unshift(playerCard);
+  computerDeck.cards.unshift(computerCard);
+
   number_of_deck +=1
   
 
   updateDeckCount()
 
-  if (isRoundWinner(playerCard, computerCard)) {
-    text.innerText = "Win"
-    playerDeck.push(playerCard)
-    playerDeck.push(computerCard)
-  } else if (isRoundWinner(computerCard, playerCard)) {
-    text.innerText = "Lose"
-    computerDeck.push(playerCard)
-    computerDeck.push(computerCard)
-  } else {
-    text.innerText = "Draw"
-    playerDeck.push(playerCard)
-    computerDeck.push(computerCard)
-  }
+  // if (isRoundWinner(playerCard, computerCard)) {
+  //   text.innerText = "Win"
+  //   playerDeck.push(playerCard)
+  //   playerDeck.push(computerCard)
+  // } else if (isRoundWinner(computerCard, playerCard)) {
+  //   text.innerText = "Lose"
+  //   computerDeck.push(playerCard)
+  //   computerDeck.push(computerCard)
+  // } else {
+  //   text.innerText = "Draw"
+  //   playerDeck.push(playerCard)
+  //   computerDeck.push(computerCard)
+  // }
 
   if (isGameOver(playerDeck)) {
     text.innerText = "You Lose!!"

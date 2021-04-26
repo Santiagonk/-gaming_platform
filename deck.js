@@ -25,11 +25,19 @@ export default class Deck {
   }
 
   pop() {
+    return this.cards.pop()
+  }  
+
+  shift() {
     return this.cards.shift()
   }
 
   push(card) {
     this.cards.push(card)
+  }
+
+  unshift(card) {
+    this.cards.unshift(card)
   }
 
   shuffle() {
