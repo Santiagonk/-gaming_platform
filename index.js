@@ -114,7 +114,7 @@ function startGameInterval (roomName){
     } else if (turn[roomName] === 2) {
       emitTurnPlayer(roomName, turn[roomName])
     }
-    console.log(state[roomName].poolDeck.length)
+    
     if (state[roomName].poolDeck.length === 0){
       console.log("Empate !!!")
       emitTie(roomName);
