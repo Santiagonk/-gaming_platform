@@ -13,33 +13,61 @@
             <h1>Cards Game 3 and 2</h1>
         </nav>
     </header>
-    <main>                
-        <section class="player-one-deck">
-            <div class="card computer-deck"></div>
-            <div class="card computer-deck"></div>
-            <div class="card computer-deck"></div>
-            <div class="card computer-deck"></div>
-            <div class="card computer-deck"></div>
+    <main>
+        <section id="initialScreen">
+            <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                <h1>Multiplayer Snake</h1>
+                <button
+                  type="submit"
+                  class="btn btn-success"
+                  id="newGameButton"
+                >
+                  Create New Game
+                </button>
+                <div>OR</div>
+                <div class="form-group">
+                  <input type="text" placeholder="Enter Game Code" id="gameCodeInput"/>
+                </div>
+                <button
+                  type="submit"
+                  class="btn btn-success"
+                  id="joinGameButton"
+                >
+                  Join Game
+                </button>
+            </div>
         </section>
-        <section class="pool-one-deck">
-            <div class="card computer-deck"></div>
-            <div class="card computer-deck flip"></div>
-            <input type="text" id="card-id">
-            <button id="change-card" class="change-button">Cambiar</button>  
-            <button id="pass-turn" class="pass-button">Pass</button>
-        </section>
-        <section class="player-two-deck">
-            <div class="card computer-deck card1"></div>
-            <div class="card computer-deck card2"></div>
-            <div class="card computer-deck card3"></div>
-            <div class="card computer-deck card4"></div>
-            <div class="card computer-deck card5"></div>
-        </section>
+
+
+        <section id= "gameScreen">
+            <h1 id='gameCodeDisplay'></h1>              
+            <section class="player-one-deck">
+                <div class="card computer-deck"></div>
+                <div class="card computer-deck"></div>
+                <div class="card computer-deck"></div>
+                <div class="card computer-deck"></div>
+                <div class="card computer-deck"></div>
+            </section>
+            <section class="pool-one-deck">
+                <div class="card computer-deck"></div>
+                <div class="card computer-deck flip"></div>
+                <input type="text" id="card-id">
+                <button id="change-card" class="change-button">Cambiar</button>  
+                <button id="pass-turn" class="pass-button">Pass</button>
+            </section>
+            <section class="player-two-deck">
+                <div class="card computer-deck card1"></div>
+                <div class="card computer-deck card2"></div>
+                <div class="card computer-deck card3"></div>
+                <div class="card computer-deck card4"></div>
+                <div class="card computer-deck card5"></div>
+            </section>
+        </section>  
     </main>
     <footer>
 
     </footer>
 </body>
 <script src="/node_modules/socket.io/client-dist/socket.io.js"></script>
-<script src="pscript.js" type="module"></script>
+<script src="pscripts.js"></script>
 </html>

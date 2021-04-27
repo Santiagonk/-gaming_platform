@@ -4,6 +4,10 @@
   margin: 0;
 }
 
+#gameScreen {
+  display: none;
+}
+
 body {
   background-color: lightblue;
 }

@@ -2,8 +2,12 @@ const socket = io("http://localhost:8000/");
 
 // socket conections
 socket.on('init', handleInit);
-socket.on('gameState')
-
+socket.on('gameState', handleGamestate);
+socket.on('gameOver', handleGameOver);
+socket.on('gameCode', handleGameCode);
+socket.on('unknownGame', handleUnknownGame);
+socket.on('tooManyPlayers', handleTooManyPlayers);
+//Com constants
 const changeCardButton = document.getElementById("change-card");
 const playerCardSlot1 = document.querySelector(".card1");
 const playerCardSlot2 = document.querySelector(".card2");
@@ -12,121 +16,123 @@ const playerCardSlot4 = document.querySelector(".card4");
 const playerCardSlot5 = document.querySelector(".card5");
 const flipCardSlot = document.querySelector(".flip");
 const pass = document.getElementById("pass-turn");
-
-socket.on('gameState', handleGamestate);
-
-function handleGamestate(gameState) {  
-  // if (!gameActive) {
-  //     return;
-  // }
-  gameState = JSON.parse(gameState); 
-  paintCards(gameState);   
-  //requestAnimationFrame(() => paintGame(gameState));
+//
+const gameScreen = document.getElementById( 'gameScreen' );
+const initialScreen = document.getElementById( 'initialScreen');
+const newGameBtn = document.getElementById( 'newGameButton');
+const joinGameBtn = document.getElementById( 'joinGameButton');
+const gameCodeInput = document.getElementById( 'gameCodeInput' );
+const gameCodeDisplay = document.getElementById( 'gameCodeDisplay' );
+// add event listeners
+newGameBtn.addEventListener('click', newGame);
+joinGameBtn.addEventListener('click', joinGame);
+changeCardButton.addEventListener('click', changeCard);
+pass.addEventListener('click', nextTurn);
+//
+function newGame () {
+    socket.emit('newGame');
+    init();
 }
+function joinGame(){
+    const code = gameCodeInput.value;
+    socket.emit('joinGame', code);
+}
+function changeCard () {
+    let position = document.getElementById("card-id").value;
+    return;
+}
+function nextTurn () {
+    return;
+}
+// global variables
+let gameActive = false;
+let playerNumber;
+// init
+function init (){    
+    initialScreen.style.display = 'none';
+    gameScreen.style.display = 'block';
+    playerCardSlot1.innerHTML= "";
+    playerCardSlot2.innerHTML= "";
+    playerCardSlot3.innerHTML= "";
+    playerCardSlot4.innerHTML= "";
+    playerCardSlot5.innerHTML= "";
 
-function paintCards(gameState){      
-  playerCardSlot1.innerHTML=`${gameState.playerOne[0].suit} ${gameState.playerOne[0].value}`
-  playerCardSlot2.innerHTML=`${gameState.playerOne[1].suit} ${gameState.playerOne[1].value}`
-  playerCardSlot3.innerHTML=`${gameState.playerOne[2].suit} ${gameState.playerOne[2].value}`
-  playerCardSlot4.innerHTML=`${gameState.playerOne[3].suit} ${gameState.playerOne[3].value}`
-  playerCardSlot5.innerHTML=`${gameState.playerOne[4].suit} ${gameState.playerOne[4].value}`
+    gameActive = true;
+}
+// function take number
+
+//
+
+
+function paintCards(gameState, player){
+    if (player === 1) {
+        playerCardSlot1.innerHTML=`${gameState.playerOne[0].suit} ${gameState.playerOne[0].value}`;
+        playerCardSlot2.innerHTML=`${gameState.playerOne[1].suit} ${gameState.playerOne[1].value}`;
+        playerCardSlot3.innerHTML=`${gameState.playerOne[2].suit} ${gameState.playerOne[2].value}`;
+        playerCardSlot4.innerHTML=`${gameState.playerOne[3].suit} ${gameState.playerOne[3].value}`;
+        playerCardSlot5.innerHTML=`${gameState.playerOne[4].suit} ${gameState.playerOne[4].value}`;
+    } else if (player === 2) {
+        playerCardSlot1.innerHTML=`${gameState.playerTwo[0].suit} ${gameState.playerTwo[0].value}`;
+        playerCardSlot2.innerHTML=`${gameState.playerTwo[1].suit} ${gameState.playerTwo[1].value}`;
+        playerCardSlot3.innerHTML=`${gameState.playerTwo[2].suit} ${gameState.playerTwo[2].value}`;
+        playerCardSlot4.innerHTML=`${gameState.playerTwo[3].suit} ${gameState.playerTwo[3].value}`;
+        playerCardSlot5.innerHTML=`${gameState.playerTwo[4].suit} ${gameState.playerTwo[4].value}`;
+    } else {
+        playerCardSlot1.innerHTML= "";
+        playerCardSlot2.innerHTML= "";
+        playerCardSlot3.innerHTML= "";
+        playerCardSlot4.innerHTML= "";
+        playerCardSlot5.innerHTML= "";
+    }  
   flipCardSlot.innerHTML=`${gameState.poolDeck[0].suit} ${gameState.poolDeck[0].value}`;  
 }
+//
+function handleInit (number) {
+    playerNumber = number;
+}
+//
+function handleGamestate(gameState) {  
+    if (!gameActive) {
+        return;
+    }
+    gameState = JSON.parse(gameState); 
+    paintCards(gameState);   
+    requestAnimationFrame(() => paintGame(gameState, playerNumber));
+  }
+//
+function handleGameOver (data) {
+    if(!gameActive){
+        return;
+    }
+    
+    data = JSON.parse(data);
 
-let playerDeck, computerDeck, poolDeck ,winner, turnOne, number_of_deck;
-
-changeCardButton.addEventListener("click", () => {
-    console.log("cambiaste de carta")
-    changeCard(playerDeck);
-    parseCards()
-    victoryCondition();
-    turnOne = false;
-});
-
-pass.addEventListener("click", () =>{
-    console.log("Siguiente Turno")
-    if (!winner){
-        flipCard();
+    if (data.winner === playerNumber){
+        alert("You Win!!!");
     } else {
-        alert("Ganaste")
+        alert("You Lose!!!");
     }
-});
-
-function startGame() {
-    const deck = new Deck();
-    deck.shuffle();
-    playerDeck = new Deck(deck.cards.slice(0, 5));
-    computerDeck = new Deck(deck.cards.slice(5, 10));    
-    poolDeck = new Deck(deck.cards.slice(10));    
-    console.log("player Deck:", playerDeck);
-    console.log("computer Deck:", computerDeck);
-    console.log("pool Deck:", poolDeck)
-    parseCards();    
+    gameActive = false;
 }
-
-function changeCard (player) { 
-    
-    console.log(poolDeck)   
-    let position = document.getElementById("card-id").value;
-    position = parseInt(position);    
-    const playerCard = player.cards.splice(position, 1);
-    const poolCard = poolDeck.pop();    
-    console.log("playercard",playerCard,"Takencard", poolCard);
-    poolDeck.cards.push(playerCard);
-    player.cards.push(poolCard); 
-    console.log(player.cards);
+//
+function handleGameCode (gameCode) {
+    gameCodeDisplay.innerText = gameCode;
 }
-
-function flipCard () {    
-    flipCardSlot.innerHTML="" 
-    const poolCard = poolDeck.shift();
-    flipCardSlot.innerHTML=`${poolCard.suit} ${poolCard.value}`;
-    poolDeck.push(poolCard)
-    console.log("pool Deck flip: ", poolDeck);
-    console.log("flip card:", poolCard); 
-    
+//
+function reset() {
+    playerNumber = null;
+    gameCodeInput.value = " ";
+    initialScreen.style.display = "block";
+    gameScreen.style.display = "none";
 }
-
-function victoryCondition (){
-    const playerArr = [];
-    let count = 0;
-    let counts = [];
-    let three = false;
-    let two = false;
-    
-    for (let i = 0; i < playerDeck.numberOfCards; i++){             
-        playerArr.unshift(playerDeck.cards[i].value)
-    }
-    for (let i = 0; i < playerArr.length; i++){
-         for (let j = 0; j < (playerArr.length);j++){            
-            if (playerArr[i]===playerArr[j]){
-                count += 1                              
-            }
-         }         
-         counts.push(count);
-         count=0;         
-    }    
-    for (let i = 0; i < counts.length; i++) {
-        if (counts[i] === 3){
-            three = true;
-        } else if (counts[i]==2){
-            two = true;
-        }
-    }   
-
-    if (three && two){
-        winner = true
-    }
+//
+function handleUnknownGame() {
+    reset();
+    alert("Unknown game code");
 }
-
-function init () {
-    winner = false;
-    turnOne = true;
-    startGame ();
-    
-    flipCard ();
-    
-    victoryCondition();    
+//
+function handleTooManyPlayers() {
+    reset();
+    alert("This game is already in progress");
 }
-
 

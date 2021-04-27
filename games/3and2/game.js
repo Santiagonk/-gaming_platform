@@ -1,16 +1,11 @@
 const { Deck } = require("./deck")
 
-
-module.exports = {
-    initGame
-}
-
-// A function to init the game state
+// init the game
 function initGame() {
     const state = createGameState();    
     return state     
 }
-// Function to start to create the game state
+// create the initial state
 function createGameState() {
     const deck = new Deck();
     deck.shuffle();   
@@ -31,7 +26,7 @@ function createGameState() {
     }  
     return state;
 }
-// Function to change the card
+//
 function changeCard (state, player, position) {      
     if (player === 1) {
         const playerCard = state.playerOne.splice(position, 1)[0];
@@ -85,23 +80,25 @@ function victoryCondition (player){
    
     return winner
 }
-// changeCardButton.addEventListener("click", () => {
-//     console.log("cambiaste de carta")
-//     changeCard(playerDeck);
-//     parseCards()
-//     victoryCondition();
-//     turnOne = false;
-// });
 
-// pass.addEventListener("click", () =>{
-//     console.log("Siguiente Turno")
-//     if (!winner){
-//         flipCard();
-//     } else {
-//         alert("Ganaste")
-//     }
-// });
+// play proof
+function gameLoop(state) {   
+    
+    const winner1 = victoryCondition(state.playerOne);
+    const winner2 = victoryCondition(state.playerTwo);  
+    
+    if (winner1) {
+        return 1;
+    } else if (winner2) {
+        return 2; 
+    } else {
+        return false;
+    }
+}
 
+module.exports = {
+    gameLoop,
+    initGame,
+    changeCard
 
-
-
+}

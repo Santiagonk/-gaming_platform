@@ -10,8 +10,8 @@ const io = require("socket.io")(httpServer, {
   }
 });
 // modules uses
-const { gameLoop, getUpdated, initGame } = require("./games/3and2/game");
-const { makeId } = require("./utils/utils");
+const { gameLoop, changeCard, initGame } = require("./games/3and2/game");
+const { makeId } = require("./utils/makeId");
 const state = {};
 const clientRooms = {};
 //middlewares
