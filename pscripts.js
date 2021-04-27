@@ -1,6 +1,9 @@
-import Deck from "./deck.js"
-
 const socket = io("http://localhost:8000/");
+
+// socket conections
+socket.on('init', handleInit);
+socket.on('gameState')
+
 const changeCardButton = document.getElementById("change-card");
 const playerCardSlot1 = document.querySelector(".card1");
 const playerCardSlot2 = document.querySelector(".card2");
@@ -9,6 +12,26 @@ const playerCardSlot4 = document.querySelector(".card4");
 const playerCardSlot5 = document.querySelector(".card5");
 const flipCardSlot = document.querySelector(".flip");
 const pass = document.getElementById("pass-turn");
+
+socket.on('gameState', handleGamestate);
+
+function handleGamestate(gameState) {  
+  // if (!gameActive) {
+  //     return;
+  // }
+  gameState = JSON.parse(gameState); 
+  paintCards(gameState);   
+  //requestAnimationFrame(() => paintGame(gameState));
+}
+
+function paintCards(gameState){      
+  playerCardSlot1.innerHTML=`${gameState.playerOne[0].suit} ${gameState.playerOne[0].value}`
+  playerCardSlot2.innerHTML=`${gameState.playerOne[1].suit} ${gameState.playerOne[1].value}`
+  playerCardSlot3.innerHTML=`${gameState.playerOne[2].suit} ${gameState.playerOne[2].value}`
+  playerCardSlot4.innerHTML=`${gameState.playerOne[3].suit} ${gameState.playerOne[3].value}`
+  playerCardSlot5.innerHTML=`${gameState.playerOne[4].suit} ${gameState.playerOne[4].value}`
+  flipCardSlot.innerHTML=`${gameState.poolDeck[0].suit} ${gameState.poolDeck[0].value}`;  
+}
 
 let playerDeck, computerDeck, poolDeck ,winner, turnOne, number_of_deck;
 
@@ -106,14 +129,4 @@ function init () {
     victoryCondition();    
 }
 
-function parseCards(){    
-    playerCardSlot1.innerHTML=`${playerDeck.cards[0].suit} ${playerDeck.cards[0].value}`
-    playerCardSlot2.innerHTML=`${playerDeck.cards[1].suit} ${playerDeck.cards[1].value}`
-    playerCardSlot3.innerHTML=`${playerDeck.cards[2].suit} ${playerDeck.cards[2].value}`
-    playerCardSlot4.innerHTML=`${playerDeck.cards[3].suit} ${playerDeck.cards[3].value}`
-    playerCardSlot5.innerHTML=`${playerDeck.cards[4].suit} ${playerDeck.cards[4].value}`
-    
-    
-}
 
-init();

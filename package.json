@@ -4,7 +4,8 @@
   "description": "Platzi Master project for cohort 7: Gaming Platform",
   "main": "deck.js",
   "scripts": {
-    "dev": "nodemon index"
+    "dev": "nodemon index",
+    "pruebas": "node ./games/3and2/pruebas"
   },
   "repository": {
     "type": "git",
