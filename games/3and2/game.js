@@ -95,10 +95,24 @@ function gameLoop(state) {
         return false;
     }
 }
+function flipCard (state) {
+    state.poolDeck.shift()
+    return state
+}
 
+function changeTurn(number, turn){
+    if (number === 1 & turn === 1){
+        return 2;
+    }
+    if (number === 2 & turn === 2){
+        return 1;
+    }
+    return turn 
+}
 module.exports = {
     gameLoop,
     initGame,
-    changeCard
-
+    changeCard,
+    flipCard,
+    changeTurn
 }

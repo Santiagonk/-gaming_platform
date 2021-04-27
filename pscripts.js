@@ -7,6 +7,8 @@ socket.on('gameOver', handleGameOver);
 socket.on('gameCode', handleGameCode);
 socket.on('unknownGame', handleUnknownGame);
 socket.on('tooManyPlayers', handleTooManyPlayers);
+socket.on('gameTurn', handleGameTurn);
+socket.on('gameTie', handleGameTie);
 //Com constants
 const changeCardButton = document.getElementById("change-card");
 const playerCardSlot1 = document.querySelector(".card1");
@@ -34,14 +36,19 @@ function newGame () {
     init();
 }
 function joinGame(){
-    const code = gameCodeInput.value;
+    const code = gameCodeInput.value;    
     socket.emit('joinGame', code);
+    init();
 }
+// client.on('changeCard', handleChangeCard);
+// handleChangeCard (position, number)
 function changeCard () {
     let position = document.getElementById("card-id").value;
+    socket.emit('changeCard', position, playerNumber);
     return;
 }
 function nextTurn () {
+    socket.emit('key', playerNumber)
     return;
 }
 // global variables
@@ -87,17 +94,17 @@ function paintCards(gameState, player){
   flipCardSlot.innerHTML=`${gameState.poolDeck[0].suit} ${gameState.poolDeck[0].value}`;  
 }
 //
-function handleInit (number) {
-    playerNumber = number;
+function handleInit (number) {    
+    playerNumber = number;      
 }
 //
-function handleGamestate(gameState) {  
+function handleGamestate(gameState) {      
     if (!gameActive) {
         return;
-    }
+    }      
     gameState = JSON.parse(gameState); 
-    paintCards(gameState);   
-    requestAnimationFrame(() => paintGame(gameState, playerNumber));
+    //paintCards(gameState);   
+   paintCards(gameState, playerNumber);
   }
 //
 function handleGameOver (data) {
@@ -106,7 +113,7 @@ function handleGameOver (data) {
     }
     
     data = JSON.parse(data);
-
+    console.log(data.winner, playerNumber)
     if (data.winner === playerNumber){
         alert("You Win!!!");
     } else {
@@ -136,3 +143,11 @@ function handleTooManyPlayers() {
     alert("This game is already in progress");
 }
 
+function handleGameTurn (playerturn) {
+    gameCodeDisplay.innerText = playerturn;
+}
+
+function handleGameTie () {    
+        alert("Tied Game!!!");   
+   
+}

@@ -10,9 +10,10 @@ const io = require("socket.io")(httpServer, {
   }
 });
 // modules uses
-const { gameLoop, changeCard, initGame } = require("./games/3and2/game");
+const { gameLoop, changeCard, initGame, flipCard, changeTurn} = require("./games/3and2/game");
 const { makeId } = require("./utils/makeId");
 const state = {};
+const turn = {};
 const clientRooms = {};
 //middlewares
 const helmet = require("helmet");
@@ -38,26 +39,28 @@ io.on('connection', client =>{
   client.on('newGame', handleNewGame);
   client.on('joinGame', handleJoinGame);
   client.on('key', handleKey);
+  client.on('changeCard', handleChangeCard);
   //function to handle join of other player
-  function handleJoinGame (roomName) {
+  function handleJoinGame (roomName) {    
     const { rooms } = client;
     let numClients;
     if (rooms){
       numClients = rooms.size;
     }
-    if (numClients == 0) {
-      client.emit('unknownCode');
-      console.log('unknownCode');
-      return;
-    } else if (numClients > 1) {
-      client.emit('tooManyPlayers');
-      console.log('tooManyPlayers');
-    }
+    // if (numClients == 0) {
+    //   client.emit('unknownCode');
+    //   console.log('unknownCode');
+    //   return;
+    // } else if (numClients > 1) {
+    //   client.emit('tooManyPlayers');
+    //   console.log('tooManyPlayers');
+    // }
     clientRooms[client.id] = roomName;
-    client.join(roomName);
+    client.join(roomName);    
     console.log("Player 2: Join to the play");
     client.number = 2;
     client.emit('init',2);
+    turn[roomName] = 1;
     startGameInterval(roomName);
   } 
   //function to handle new game
@@ -72,15 +75,52 @@ io.on('connection', client =>{
       client.emit('init', 1); 
   }
   function handleKey (keyCode){
-
+    const roomName = clientRooms[client.id];    
+    if (!roomName){
+      return;
+    }
+    if(keyCode === turn[roomName]){
+      state[roomName] = flipCard(state[roomName])
+      turn[roomName] = changeTurn(keyCode, turn[roomName]);      
+    } else {
+      console.log("turno equivocado")
+    }
+    console.log(turn[roomName])
+    return;
+  }
+  function  handleChangeCard (position, number){
+    const roomName = clientRooms[client.id];    
+    if (!roomName){
+      return;
+    }
+    if(turn[roomName] === number){      
+      state[roomName] = changeCard(state[roomName], number, position);      
+      turn[roomName] = changeTurn(number, turn[roomName]); 
+      emitGameState(roomName, state[roomName]); 
+    } else {
+      console.log("Turno equivocado")
+    }   
+    return;
   }
 });
 //connection functions
 // Interval handling function
 function startGameInterval (roomName){
+  
   const intervalId = setInterval(() =>{
     const winner = gameLoop(state[roomName]);
-    if (!winner){
+    if (turn[roomName] === 1) {
+      emitTurnPlayer(roomName, turn[roomName])
+    } else if (turn[roomName] === 2) {
+      emitTurnPlayer(roomName, turn[roomName])
+    }
+    console.log(state[roomName].poolDeck.length)
+    if (state[roomName].poolDeck.length === 0){
+      console.log("Empate !!!")
+      emitTie(roomName);
+      state[roomName] = null;
+      clearInterval(intervalId);
+    } else if (!winner) {    
       emitGameState(roomName, state[roomName]);
     } else {
       emitGameOver(roomName, winner);
@@ -90,7 +130,7 @@ function startGameInterval (roomName){
   });
 }
 //
-function emitGameState (roomName, state){
+function emitGameState (roomName, state){  
   io.sockets.in(roomName)
     .emit('gameState', JSON.stringify(state));
 }
@@ -98,6 +138,14 @@ function emitGameState (roomName, state){
 function emitGameOver (roomName, winner) {
   io.sockets.in(roomName)
     .emit('gameOver', JSON.stringify({ winner }));
+}
+function emitTurnPlayer (roomName, number) {
+  io.sockets.in(roomName)
+    .emit('gameTurn', `Turn Player ${number}`);
+}
+function emitTie (roomName) {
+  io.sockets.in(roomName)
+    .emit('gameTie');
 }
 //io.listen(8000);
 httpServer.listen(8000, () => {
