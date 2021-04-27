@@ -2,17 +2,16 @@ const express = require('express');
 const path = require("path");
 const app = express();
 const httpServer = require('http').createServer(app);
-//const server = http.createServer(app);
+// Init the io 
 const io = require("socket.io")(httpServer, {
   cors: {
     origin: ["http://127.0.0.1:5500", "http://localhost:8000/"],
     methods: ["GET", "POST"]
   }
 });
-
+//middlewares
 const helmet = require("helmet");
-var cors = require('cors');
-
+const cors = require('cors');
 app.use(
     helmet({
       contentSecurityPolicy: false,
@@ -29,6 +28,10 @@ app.use("/",express.static(path.join(__dirname, "/")));
 app.get('/', function(req, res){
     res.redirect('/');   
   });
+// Put a io connection
+io.on('connection', client =>{
+  console.log('a user connected');
+});
 //io.listen(8000);
 httpServer.listen(8000, () => {
     console.log('listening on *:8000');

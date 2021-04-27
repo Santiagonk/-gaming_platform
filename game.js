@@ -1,5 +1,6 @@
 import Deck from "./deck.js"
 
+const socket = io("http://localhost:8000/");
 const changeCardButton = document.getElementById("change-card");
 const playerCardSlot1 = document.querySelector(".card1");
 const playerCardSlot2 = document.querySelector(".card2");
