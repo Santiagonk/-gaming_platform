@@ -26,6 +26,15 @@ const getUsersById = async(req, res) => {
    }
 }
 
+const getUsersByUsername = async(req, res) => {
+   try {
+       const {username, password} = req.body;
+       const response = await pool.query('SELECT * FROM users WHERE id = $1', [id])
+       res.json(response.rows).send("User ID " + req.params.id);
+   } catch (error) {
+   }
+}
+
 const createUser =  async (req, res) =>{
     try {
         const {name, username, password, email } = req.body;
@@ -76,5 +85,6 @@ module.exports = {
     createUser,
     getUsersById,
     deleteUser,
-    updatedUser
+    updatedUser,
+    getUsersByUsername
 }
