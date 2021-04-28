@@ -31,6 +31,7 @@ app.use(
 //static files
 app.use("/",express.static(path.join(__dirname, "/")));
 //redirect
+app.use(require('./routes/index'));
 app.get('/', function(req, res){
     res.redirect('/');   
   });
