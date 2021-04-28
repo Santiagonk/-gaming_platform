@@ -8,7 +8,7 @@ const pool = new Pool({
     port: config.dbPort
 });
 
-const getUsers =  async (req, res) =>{    
+const getUsers =  async (req, res) =>{
     try {
         const response = await pool.query('SELECT * FROM users');        
         res.status(200).json(response.rows);
@@ -23,15 +23,18 @@ const getUsersById = async(req, res) => {
        const response = await pool.query('SELECT * FROM users WHERE id = $1', [id])
        res.json(response.rows).send("User ID " + req.params.id);
    } catch (error) {
+    console.error(error);
    }
 }
 
 const getUsersByUsername = async(req, res) => {
    try {
-       const {username, password} = req.body;
-       const response = await pool.query('SELECT * FROM users WHERE id = $1', [id])
-       res.json(response.rows).send("User ID " + req.params.id);
+       const { username, password } = req.body;
+       const response = await pool.query('SELECT password FROM users WHERE username = $1::text', [username]);
+       console.log(response);
+       res.json(response.rows);
    } catch (error) {
+    console.error(error);
    }
 }
 
@@ -61,6 +64,7 @@ const deleteUser = async (req, res) => {
         pool.query('DELETE FROM users WHERE id = $1', [id]);
         res.json(`User ${id} deleted succesfully`);
     } catch (error) {
+        console.error(error);
     }
 }
 
@@ -76,6 +80,7 @@ const updatedUser = async (req, res) => {
             id]);
          res.json('User updated')
     } catch (error) {
+        console.error(error);
     }
 }
 
