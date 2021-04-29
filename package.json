@@ -5,7 +5,7 @@
   "main": "deck.js",
   "scripts": {
     "dev": "nodemon index",
-    "pruebas": "node ./games/3and2/pruebas"
+    "pruebas": "node ./script2.js"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "socket.io": "^4.0.1"
   },
   "devDependencies": {
-    "chalk": "^3.0.0"
+    "chalk": "^3.0.0",
+    "node-fetch": "^2.6.1"
   }
 }

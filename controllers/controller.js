@@ -52,13 +52,10 @@ const createUser =  async (req, res) =>{
             username,
             password,
             email]);
-        console.log("User created");
-        //  res.json({
-        //      message: 'User Add Succesfully',
-        //      body:{
-        //          user: {name, username, password, email}
-        //      }
-        //  });
+            res.status(201).json({
+                data: response.rows[0],
+                message: "products listed"
+            });
     } catch(error){
         console.error(error);
     }
@@ -84,7 +81,7 @@ const updatedUser = async (req, res) => {
             password,
             email,
             id]);
-         res.json('User updated')
+        res.json('User updated')
     } catch (error) {
         console.error(error);
     }
@@ -96,7 +93,7 @@ const login = async (req, res) => {
         const response = await pool.query(' SELECT id, name, username, password FROM users WHERE username=$1::text', [username]);
         const passworduser= response.rows[0].password;
         const validPassword = passworduser === password;
-        if (!validPassword) return res.status(400).json({ error: 'Unauthorized'});
+        if (!validPassword) return res.status(400).json({ error: 'Unauthorized', data: null});
         const token = jwt.sign({
             name: response.rows[0].name,
             id: response.rows[0].id
