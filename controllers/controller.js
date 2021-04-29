@@ -93,15 +93,13 @@ const login = async (req, res) => {
     try {
         const {username, password} = req.body;
         const response = await pool.query(' SELECT id, username, password FROM users WHERE username=$1::text', [username]);
-        console.log(response);
         const passworduser= response.rows[0].password;
-        if (passworduser === password){
-            console.log('user login');
-            res.json('user login');
-        }else{
-            console.log('failed in authentication');
-            res.json('failed in authentication');
-        }
+        const validPassword = passworduser === password;
+        if (!validPassword) return res.status(400).json({ error: 'Unauthorized'});
+        res.json({
+            error: null,
+            data: 'Welcome'
+        });
     } catch(error){
         console.error(error);
     }
