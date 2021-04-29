@@ -89,7 +89,7 @@ const updatedUser = async (req, res) => {
     }
 }
 
-const login = async (req, res) => {    
+const login = async (req, res) => {
     try {
         const {username, password} = req.body;
         const response = await pool.query(' SELECT id, username, password FROM users WHERE username=$1::text', [username]);
