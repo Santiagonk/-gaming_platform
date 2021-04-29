@@ -1,3 +1,5 @@
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
 const { Pool } = require('pg');
 const { config } = require('../config/config');
 const pool = new Pool({
@@ -8,9 +10,23 @@ const pool = new Pool({
     port: config.dbPort
 });
 
+
+//setting up our local strategy
+passport.use('local', new LocalStrategy({passReqToCallBack: true}, async ( username, password, cb )=> {
+    console.log("this is being executed");
+    const response = await pool.query('SELECT * FROM users', [username]); //'SELECT id, username, password FROM users WHERE username=$1::text'
+    console.log(response);
+    // res.json({
+    // message: 'User Add Succesfully',
+    // body:{
+    //     user: {username, password, email}
+    //     }
+    // });
+}));
+
 const getUsers =  async (req, res) =>{
     try {
-        const response = await pool.query('SELECT * FROM users');        
+        const response = await pool.query('SELECT * FROM users');
         res.status(200).json(response.rows);
     } catch(error){
         console.error(error);
@@ -27,17 +43,6 @@ const getUsersById = async(req, res) => {
    }
 }
 
-const getUsersByUsername = async(req, res) => {
-   try {
-       const { username, password } = req.body;
-       const response = await pool.query('SELECT password FROM users WHERE username = $1::text', [username]);
-       console.log(response);
-       res.json(response.rows);
-   } catch (error) {
-    console.error(error);
-   }
-}
-
 const createUser =  async (req, res) =>{
     try {
         const {name, username, password, email } = req.body;
@@ -46,13 +51,13 @@ const createUser =  async (req, res) =>{
             username,
             password,
             email]);
-        console.log(response);
-         res.json({
-             message: 'User Add Succesfully',
-             body:{
-                 user: {name, username, password, email}
-             }
-         });
+        console.log("User created");
+        //  res.json({
+        //      message: 'User Add Succesfully',
+        //      body:{
+        //          user: {name, username, password, email}
+        //      }
+        //  });
     } catch(error){
         console.error(error);
     }
@@ -84,12 +89,29 @@ const updatedUser = async (req, res) => {
     }
 }
 
+const login = async (req, res) => {    
+    try {
+        const {username, password} = req.body;
+        const response = await pool.query(' SELECT id, username, password FROM users WHERE username=$1::text', [username]);
+        console.log(response);
+        const passworduser= response.rows[0].password;
+        if (passworduser === password){
+            console.log('user login');
+            res.json('user login');
+        }else{
+            console.log('failed in authentication');
+            res.json('failed in authentication');
+        }
+    } catch(error){
+        console.error(error);
+    }
+}
 
 module.exports = {
     getUsers,
     createUser,
     getUsersById,
     deleteUser,
-    updatedUser,
-    getUsersByUsername
+    login,
+    updatedUser
 }

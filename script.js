@@ -19,24 +19,40 @@ const playerCardSlot5 = document.querySelector(".card5");
 const flipCardSlot = document.querySelector(".flip");
 const pass = document.getElementById("pass-turn");
 //
+const InitialScreen = document.getElementById( 'initialScreen');
+const IdScreen = document.getElementById( 'idScreen');
+const signUpScreen = document.getElementById( 'signUpScreen');
 const gameScreen = document.getElementById( 'gameScreen' );
-const initialScreen = document.getElementById( 'initialScreen');
+const signUpBtn = document.getElementById( 'SignUp');
+const sendForm = document.getElementById( 'SendForm');
 const newGameBtn = document.getElementById( 'newGameButton');
 const joinGameBtn = document.getElementById( 'joinGameButton');
 const gameCodeInput = document.getElementById( 'gameCodeInput' );
 const gameCodeDisplay = document.getElementById( 'gameCodeDisplay' );
+//
+
 // add event listeners
+signUpBtn.addEventListener('click', registerForm);
+sendForm.addEventListener('click', sendFormValidation);
 newGameBtn.addEventListener('click', newGame);
 joinGameBtn.addEventListener('click', joinGame);
 changeCardButton.addEventListener('click', changeCard);
 pass.addEventListener('click', nextTurn);
 //
+function sendFormValidation (){
+    signUpScreen.style.display = 'none';
+    IdScreen.style.display = 'block';
+}
+function registerForm (){
+    InitialScreen.style.display = 'none';
+    signUpScreen.style.display = 'block';
+}
 function newGame () {
     socket.emit('newGame');
     init();
 }
 function joinGame(){
-    const code = gameCodeInput.value;    
+    const code = gameCodeInput.value;
     socket.emit('joinGame', code);
     init();
 }
@@ -55,8 +71,8 @@ function nextTurn () {
 let gameActive = false;
 let playerNumber;
 // init
-function init (){    
-    initialScreen.style.display = 'none';
+function init (){
+    IdScreen.style.display = 'none';
     gameScreen.style.display = 'block';
     playerCardSlot1.innerHTML= "";
     playerCardSlot2.innerHTML= "";

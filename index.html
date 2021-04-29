@@ -15,8 +15,50 @@
     </header>
     <main>
         <section id="initialScreen">
+            <form action="/login" method="post">
+                <div>
+                    <label>Username:</label>
+                    <input type="text" name="username"/>
+                </div>
+                <div>
+                    <label>Password:</label>
+                    <input type="password" name="password"/>
+                </div>
+                <div>
+                    <input type="submit" value="Log In"/>
+                </div>
+            </form>
+            <input type="button" value="SignUp" id="SignUp"/>
+        </section>
+
+        <section id="signUpScreen">
+            <form action="/sign-up" method="post">
+                <div>
+                    <label>Name:</label>
+                    <input type="text" name="name"/>
+                </div>
+                <div>
+                    <label>Username:</label>
+                    <input type="text" name="username"/>
+                </div>
+                <div>
+                    <label>email:</label>
+                    <input type="text" name="email"/>
+                </div>
+                <div>
+                    <label>Password:</label>
+                    <input type="password" name="password"/>
+                </div>
+                <div>
+                    <input type="submit" value="Send" id="SendForm"/>
+                </div>
+            </form>
+        </section>
+
+
+        <section id="idScreen">
             <div class="d-flex flex-column align-items-center justify-content-center h-100">
-                <h1>Multiplayer Snake</h1>
+                <h1>Multiplayer 3 and 2</h1>
                 <button
                   type="submit"
                   class="btn btn-success"
@@ -40,7 +82,7 @@
 
 
         <section id= "gameScreen">
-            <h1 id='gameCodeDisplay'></h1>              
+            <h1 id='gameCodeDisplay'></h1>
             <section class="player-one-deck">
                 <div class="card computer-deck"></div>
                 <div class="card computer-deck"></div>
@@ -52,7 +94,7 @@
                 <div class="card computer-deck"></div>
                 <div class="card computer-deck flip"></div>
                 <input type="text" id="card-id">
-                <button id="change-card" class="change-button">Cambiar</button>  
+                <button id="change-card" class="change-button">Cambiar</button>
                 <button id="pass-turn" class="pass-button">Pass</button>
             </section>
             <section class="player-two-deck">
@@ -62,7 +104,7 @@
                 <div class="card computer-deck card4"></div>
                 <div class="card computer-deck card5"></div>
             </section>
-        </section>  
+        </section>
     </main>
     <footer>
 

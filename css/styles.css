@@ -8,12 +8,20 @@
   display: none;
 }
 
+#idScreen {
+  display: none;
+}
+
+#signUpScreen {
+  display: none;
+}
+
 body {
   background-color: lightblue;
 }
 
 h1 {
-  background-color: dodgerblue;    
+  background-color: dodgerblue;
   color: white;
   text-align: center;
 }
