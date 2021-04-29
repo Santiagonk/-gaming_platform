@@ -99,33 +99,35 @@ io.on('connection', client =>{
       return;
     }
     if(keyCode === turn[roomName]){
-      state[roomName] = flipCard(state[roomName])
-      turn[roomName] = changeTurn(keyCode, turn[roomName]);
+      if(turn[roomName]===1){
+        turn[roomName] = changeTurn(keyCode, turn[roomName]);
+      }else {
+        state[roomName] = flipCard(state[roomName])
+        turn[roomName] = changeTurn(keyCode, turn[roomName]);
+      }
     } else {
       console.log("turno equivocado")
     }
-    console.log(turn[roomName])
     return;
   }
   function  handleChangeCard (position, number){
-    const roomName = clientRooms[client.id];    
+    const roomName = clientRooms[client.id];
     if (!roomName){
       return;
     }
-    if(turn[roomName] === number){      
-      state[roomName] = changeCard(state[roomName], number, position);      
-      turn[roomName] = changeTurn(number, turn[roomName]); 
-      emitGameState(roomName, state[roomName]); 
+    if(turn[roomName] === number){
+      state[roomName] = changeCard(state[roomName], number, position);
+      turn[roomName] = changeTurn(number, turn[roomName]);
+      emitGameState(roomName, state[roomName]);
     } else {
       console.log("Turno equivocado")
-    }   
+    }
     return;
   }
 });
 //connection functions
 // Interval handling function
 function startGameInterval (roomName){
-  
   const intervalId = setInterval(() =>{
     const winner = gameLoop(state[roomName]);
     if (turn[roomName] === 1) {
@@ -133,13 +135,13 @@ function startGameInterval (roomName){
     } else if (turn[roomName] === 2) {
       emitTurnPlayer(roomName, turn[roomName])
     }
-    
+
     if (state[roomName].poolDeck.length === 0){
       console.log("Empate !!!")
       emitTie(roomName);
       state[roomName] = null;
       clearInterval(intervalId);
-    } else if (!winner) {    
+    } else if (!winner) {
       emitGameState(roomName, state[roomName]);
     } else {
       emitGameOver(roomName, winner);
@@ -149,7 +151,7 @@ function startGameInterval (roomName){
   });
 }
 //
-function emitGameState (roomName, state){  
+function emitGameState (roomName, state){
   io.sockets.in(roomName)
     .emit('gameState', JSON.stringify(state));
 }
@@ -160,7 +162,7 @@ function emitGameOver (roomName, winner) {
 }
 function emitTurnPlayer (roomName, number) {
   io.sockets.in(roomName)
-    .emit('gameTurn', `Turn Player ${number}`);
+    .emit('gameTurn', number);
 }
 function emitTie (roomName) {
   io.sockets.in(roomName)
