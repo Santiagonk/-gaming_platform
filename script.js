@@ -38,7 +38,7 @@ async function postData(url = '', data = {}) {
       mode: 'cors', // no-cors, *cors, same-origin
       cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
       credentials: 'same-origin', // include, *same-origin, omit
-      headers: {
+        headers: {
         'Content-Type': 'application/json'
         //'Content-Type': 'application/x-www-form-urlencoded',
     },
@@ -59,7 +59,7 @@ login.addEventListener('click', on);
 function on () {
     const url = 'http://localhost:8000/login';
     const usern = document.getElementById("user").value;
-    const passn = document.getElementById("pass").value;    
+    const passn = document.getElementById("pass").value;
     let data = {
         "username": usern,
         "password": passn
@@ -73,7 +73,7 @@ function on () {
             alert("Not valid user")
         }
     });
- }
+}
 // sendFormValidation
 function sendFormValidation (){
     signUpScreen.style.display = 'none';
@@ -133,7 +133,6 @@ function init (){
     playerCardSlot3.innerHTML= "";
     playerCardSlot4.innerHTML= "";
     playerCardSlot5.innerHTML= "";
-
     gameActive = true;
 }
 // function take number
@@ -160,20 +159,20 @@ function paintCards(gameState, player){
         playerCardSlot3.innerHTML= "";
         playerCardSlot4.innerHTML= "";
         playerCardSlot5.innerHTML= "";
-    }  
-  flipCardSlot.innerHTML=`${gameState.poolDeck[0].suit} ${gameState.poolDeck[0].value}`;  
+    }
+  flipCardSlot.innerHTML=`${gameState.poolDeck[0].suit} ${gameState.poolDeck[0].value}`;
 }
 //
-function handleInit (number) {    
-    playerNumber = number;      
+function handleInit (number) {
+    playerNumber = number;
 }
 //
-function handleGamestate(gameState) {      
+function handleGamestate(gameState) {
     if (!gameActive) {
         return;
-    }      
-    gameState = JSON.parse(gameState); 
-    //paintCards(gameState);   
+    }
+    gameState = JSON.parse(gameState);
+    //paintCards(gameState);
    paintCards(gameState, playerNumber);
   }
 //
@@ -181,7 +180,6 @@ function handleGameOver (data) {
     if(!gameActive){
         return;
     }
-    
     data = JSON.parse(data);
     console.log(data.winner, playerNumber)
     if (data.winner === playerNumber){
@@ -190,6 +188,8 @@ function handleGameOver (data) {
         alert("You Lose!!!");
     }
     gameActive = false;
+    gameScreen.style.display = 'none';
+    IdScreen.style.display = 'block';
 }
 //
 function handleGameCode (gameCode) {
@@ -214,11 +214,17 @@ function handleTooManyPlayers() {
 }
 
 function handleGameTurn (playerturn) {
-    gameCodeDisplay.innerText = playerturn;
+    if (playerturn == playerNumber){
+        gameCodeDisplay.innerText = "Your Turn";
+    } else {
+        gameCodeDisplay.innerText = "Wait for your turn";
+    }
 }
 
 function handleGameTie () {
         alert("Tied Game!!!");
+        gameScreen.style.display = 'none';
+        IdScreen.style.display = 'block';
 }
 
 
