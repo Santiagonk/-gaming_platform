@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require("path");
+const session = require('express-session')
 const app = express();
 const httpServer = require('http').createServer(app);
 // Init the io 
@@ -9,6 +10,12 @@ const io = require("socket.io")(httpServer, {
     methods: ["GET", "POST"]
   }
 });
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true
+}))
+
 // modules uses
 const { gameLoop, changeCard, initGame, flipCard, changeTurn} = require("./games/3and2/game");
 const { makeId } = require("./utils/makeId");
@@ -33,16 +40,26 @@ app.use("/",express.static(path.join(__dirname, "/")));
 //redirect
 app.use(require('./routes/index'));
 app.get('/', function(req, res){
-    res.redirect('/');   
+    res.redirect('/');
   });
 // Put a io connection
 io.on('connection', client =>{
+  client.on('SignUp', handleRegister);
+  client.on('Login', handleLoginGame);
   client.on('newGame', handleNewGame);
   client.on('joinGame', handleJoinGame);
   client.on('key', handleKey);
   client.on('changeCard', handleChangeCard);
+  //
+  function handleRegister (){
+
+  }
+  //login function
+  function handleLoginGame (){
+
+  }
   //function to handle join of other player
-  function handleJoinGame (roomName) {    
+  function handleJoinGame (roomName) {
     const { rooms } = client;
     let numClients;
     if (rooms){
@@ -57,32 +74,33 @@ io.on('connection', client =>{
     //   console.log('tooManyPlayers');
     // }
     clientRooms[client.id] = roomName;
-    client.join(roomName);    
+    client.join(roomName);
     console.log("Player 2: Join to the play");
     client.number = 2;
     client.emit('init',2);
     turn[roomName] = 1;
     startGameInterval(roomName);
-  } 
+  }
   //function to handle new game
   function handleNewGame (){
       let roomName = makeId(5);
+      console.log(roomName)
       clientRooms[client.id] = roomName;
       client.emit('gameCode', roomName);
       state[roomName] = initGame();
       client.join(roomName);
       console.log("Player 1: Join to the play");
       client.number = 1;
-      client.emit('init', 1); 
+      client.emit('init', 1);
   }
   function handleKey (keyCode){
-    const roomName = clientRooms[client.id];    
+    const roomName = clientRooms[client.id];
     if (!roomName){
       return;
     }
     if(keyCode === turn[roomName]){
       state[roomName] = flipCard(state[roomName])
-      turn[roomName] = changeTurn(keyCode, turn[roomName]);      
+      turn[roomName] = changeTurn(keyCode, turn[roomName]);
     } else {
       console.log("turno equivocado")
     }
