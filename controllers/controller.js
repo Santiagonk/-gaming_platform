@@ -2,6 +2,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const { Pool } = require('pg');
 const { config } = require('../config/config');
+const jwt = require('jsonwebtoken')
 const pool = new Pool({
     host: config.dbHost,
     user: config.dbUser,
@@ -92,14 +93,22 @@ const updatedUser = async (req, res) => {
 const login = async (req, res) => {
     try {
         const {username, password} = req.body;
-        const response = await pool.query(' SELECT id, username, password FROM users WHERE username=$1::text', [username]);
+        const response = await pool.query(' SELECT id, name, username, password FROM users WHERE username=$1::text', [username]);
         const passworduser= response.rows[0].password;
         const validPassword = passworduser === password;
         if (!validPassword) return res.status(400).json({ error: 'Unauthorized'});
-        res.json({
+        const token = jwt.sign({
+            name: response.rows[0].name,
+            id: response.rows[0].id
+        }, config.auth_jwt_secret)
+        await pool.query(' INSERT INTO tokens (username_id, token, status) VALUES ($1, $2, $3)', [
+            response.rows[0].id,
+            token,
+            true]);
+        res.header('auth-token').json({
             error: null,
-            data: 'Welcome'
-        });
+            data: {token}
+        })
     } catch(error){
         console.error(error);
     }
