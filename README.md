@@ -8,7 +8,9 @@ Una plataforma de juegos de multijugador basícos, tales como:
 * Ajedrez (Futura implementación)
 * Tetris (Futura implementación)
 
+Puedes disfrutar del mismo en el siguiente link:
 
+https://ancient-cove-37870.herokuapp.com/
 
 
 ## Instalación
